@@ -5,7 +5,7 @@
 use super::super::c;
 use crate::io;
 use crate::net::{Ipv4Addr, Ipv6Addr, SocketAddrAny, SocketAddrUnix, SocketAddrV4, SocketAddrV6};
-use alloc::vec::Vec;
+//use alloc::vec::Vec;
 use core::mem::size_of;
 
 // This must match the header of `sockaddr`.
@@ -93,12 +93,13 @@ pub(crate) unsafe fn read_sockaddr(
                     decode.sun_path[len - 1 - offsetof_sun_path],
                     b'\0' as c::c_char
                 );
-                Ok(SocketAddrAny::Unix(SocketAddrUnix::new(
-                    decode.sun_path[..len - 1 - offsetof_sun_path]
-                        .iter()
-                        .map(|c| *c as u8)
-                        .collect::<Vec<u8>>(),
-                )?))
+                panic!()
+                //Ok(SocketAddrAny::Unix(SocketAddrUnix::new(
+                //    decode.sun_path[..len - 1 - offsetof_sun_path]
+                //        .iter()
+                //        .map(|c| *c as u8)
+                //        .collect::<Vec<u8>>(),
+                //)?))
             }
         }
         _ => Err(io::Errno::NOTSUP),
@@ -159,15 +160,16 @@ pub(crate) unsafe fn read_sockaddr_os(storage: *const c::sockaddr, len: usize) -
                     decode.sun_path[len - 1 - offsetof_sun_path],
                     b'\0' as c::c_char
                 );
-                SocketAddrAny::Unix(
-                    SocketAddrUnix::new(
-                        decode.sun_path[..len - 1 - offsetof_sun_path]
-                            .iter()
-                            .map(|c| *c as u8)
-                            .collect::<Vec<u8>>(),
-                    )
-                    .unwrap(),
-                )
+                todo!()
+                //SocketAddrAny::Unix(
+                //    SocketAddrUnix::new(
+                //        decode.sun_path[..len - 1 - offsetof_sun_path]
+                //            .iter()
+                //            .map(|c| *c as u8)
+                //            .collect::<Vec<u8>>(),
+                //    )
+                //    .unwrap(),
+                //)
             }
         }
         other => unimplemented!("{:?}", other),

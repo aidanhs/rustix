@@ -32,8 +32,8 @@ mod wait;
 pub use chdir::chdir;
 #[cfg(not(any(target_os = "wasi", target_os = "fuchsia")))]
 pub use chdir::fchdir;
-#[cfg(not(target_os = "wasi"))]
-pub use chdir::getcwd;
+//#[cfg(not(target_os = "wasi"))]
+//pub use chdir::getcwd;
 #[cfg(not(target_os = "wasi"))]
 pub use exit::EXIT_SIGNALED_SIGABRT;
 pub use exit::{EXIT_FAILURE, EXIT_SUCCESS};

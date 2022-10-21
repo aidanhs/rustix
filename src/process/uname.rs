@@ -88,13 +88,14 @@ impl fmt::Debug for Uname {
         {
             write!(
                 fmt,
-                "{} {} {} {} {} {}",
-                self.sysname().to_string_lossy(),
-                self.nodename().to_string_lossy(),
-                self.release().to_string_lossy(),
-                self.version().to_string_lossy(),
-                self.machine().to_string_lossy(),
-                self.domainname().to_string_lossy(),
+                "(debug printout disabled)"
+                //"{} {} {} {} {} {}",
+                //self.sysname().to_string_lossy(),
+                //self.nodename().to_string_lossy(),
+                //self.release().to_string_lossy(),
+                //self.version().to_string_lossy(),
+                //self.machine().to_string_lossy(),
+                //self.domainname().to_string_lossy(),
             )
         }
     }

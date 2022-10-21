@@ -5,16 +5,16 @@
 //! to rustix APIs with string arguments, and it allows rustix to implement
 //! NUL-termination without the need for copying where possible.
 
-use crate::ffi::{CStr, CString};
+use crate::ffi::{CStr/*, CString*/};
 use crate::io;
 #[cfg(feature = "itoa")]
 use crate::path::DecInt;
 use crate::path::SMALL_PATH_BUFFER_SIZE;
-use alloc::borrow::Cow;
-#[cfg(feature = "itoa")]
-use alloc::borrow::ToOwned;
-use alloc::string::String;
-use alloc::vec::Vec;
+//use alloc::borrow::Cow;
+//#[cfg(feature = "itoa")]
+//use alloc::borrow::ToOwned;
+//use alloc::string::String;
+//use alloc::vec::Vec;
 use core::str;
 #[cfg(feature = "std")]
 use std::ffi::{OsStr, OsString};
@@ -68,18 +68,18 @@ pub trait Arg {
     /// Returns a view of this string as a string slice.
     fn as_str(&self) -> io::Result<&str>;
 
-    /// Returns a potentially-lossy rendering of this string as a `Cow<'_,
-    /// str>`.
-    fn to_string_lossy(&self) -> Cow<'_, str>;
+    ///// Returns a potentially-lossy rendering of this string as a `Cow<'_,
+    ///// str>`.
+    //fn to_string_lossy(&self) -> Cow<'_, str>;
 
-    /// Returns a view of this string as a maybe-owned [`CStr`].
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>>;
+    ///// Returns a view of this string as a maybe-owned [`CStr`].
+    //fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>>;
 
-    /// Consumes `self` and returns a view of this string as a maybe-owned
-    /// [`CStr`].
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b;
+    ///// Consumes `self` and returns a view of this string as a maybe-owned
+    ///// [`CStr`].
+    //fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+    //where
+    //    Self: 'b;
 
     /// Runs a closure with `self` passed in as a `&CStr`.
     fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
@@ -94,63 +94,27 @@ impl Arg for &str {
         Ok(self)
     }
 
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        Cow::Borrowed(self)
-    }
+    //#[inline]
+    //fn to_string_lossy(&self) -> Cow<'_, str> {
+    //    Cow::Borrowed(self)
+    //}
 
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(*self).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
+    //#[inline]
+    //fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+    //    Ok(Cow::Owned(
+    //        CString::new(*self).map_err(|_cstr_err| io::Errno::INVAL)?,
+    //    ))
+    //}
 
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(
-            CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        with_c_str(self.as_bytes(), f)
-    }
-}
-
-impl Arg for &String {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        Ok(self)
-    }
-
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        Cow::Borrowed(self)
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(String::as_str(self)).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        self.as_str().into_c_str()
-    }
+    //#[inline]
+    //fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+    //where
+    //    Self: 'b,
+    //{
+    //    Ok(Cow::Owned(
+    //        CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
+    //    ))
+    //}
 
     #[inline]
     fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
@@ -162,43 +126,79 @@ impl Arg for &String {
     }
 }
 
-impl Arg for String {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        Ok(self)
-    }
+//impl Arg for &String {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        Ok(self)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        Cow::Borrowed(self)
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Owned(
+//            CString::new(String::as_str(self)).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        self.as_str().into_c_str()
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        with_c_str(self.as_bytes(), f)
+//    }
+//}
 
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        Cow::Borrowed(self)
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(self.as_str()).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(
-            CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        f(&CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?)
-    }
-}
+//impl Arg for String {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        Ok(self)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        Cow::Borrowed(self)
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Owned(
+//            CString::new(self.as_str()).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(Cow::Owned(
+//            CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        f(&CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?)
+//    }
+//}
 
 #[cfg(feature = "std")]
 impl Arg for &OsStr {
@@ -444,57 +444,23 @@ impl Arg for &CStr {
         self.to_str().map_err(|_utf8_err| io::Errno::INVAL)
     }
 
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        CStr::to_string_lossy(self)
-    }
+    //#[inline]
+    //fn to_string_lossy(&self) -> Cow<'_, str> {
+    //    CStr::to_string_lossy(self)
+    //}
 
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Borrowed(self))
-    }
+    //#[inline]
+    //fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+    //    Ok(Cow::Borrowed(self))
+    //}
 
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Borrowed(self))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        f(self)
-    }
-}
-
-impl Arg for &CString {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        unimplemented!()
-    }
-
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        unimplemented!()
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Borrowed(self))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Borrowed(self))
-    }
+    //#[inline]
+    //fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+    //where
+    //    Self: 'b,
+    //{
+    //    Ok(Cow::Borrowed(self))
+    //}
 
     #[inline]
     fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
@@ -506,81 +472,115 @@ impl Arg for &CString {
     }
 }
 
-impl Arg for CString {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        self.to_str().map_err(|_utf8_err| io::Errno::INVAL)
-    }
+//impl Arg for &CString {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        unimplemented!()
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        unimplemented!()
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Borrowed(self))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(Cow::Borrowed(self))
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        f(self)
+//    }
+//}
 
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        CStr::to_string_lossy(self)
-    }
+//impl Arg for CString {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        self.to_str().map_err(|_utf8_err| io::Errno::INVAL)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        CStr::to_string_lossy(self)
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Borrowed(self))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(Cow::Owned(self))
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        f(&self)
+//    }
+//}
 
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Borrowed(self))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(self))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        f(&self)
-    }
-}
-
-impl<'a> Arg for Cow<'a, str> {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        Ok(self)
-    }
-
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        Cow::Borrowed(self)
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(self.as_ref()).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(
-            match self {
-                Cow::Owned(s) => CString::new(s),
-                Cow::Borrowed(s) => CString::new(s),
-            }
-            .map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        with_c_str(self.as_bytes(), f)
-    }
-}
+//impl<'a> Arg for Cow<'a, str> {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        Ok(self)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        Cow::Borrowed(self)
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Owned(
+//            CString::new(self.as_ref()).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(Cow::Owned(
+//            match self {
+//                Cow::Owned(s) => CString::new(s),
+//                Cow::Borrowed(s) => CString::new(s),
+//            }
+//            .map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        with_c_str(self.as_bytes(), f)
+//    }
+//}
 
 #[cfg(feature = "std")]
 impl<'a> Arg for Cow<'a, OsStr> {
@@ -625,40 +625,40 @@ impl<'a> Arg for Cow<'a, OsStr> {
     }
 }
 
-impl<'a> Arg for Cow<'a, CStr> {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        self.to_str().map_err(|_utf8_err| io::Errno::INVAL)
-    }
-
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        let borrow: &CStr = core::borrow::Borrow::borrow(self);
-        borrow.to_string_lossy()
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Borrowed(self))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(self)
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        f(&self)
-    }
-}
+//impl<'a> Arg for Cow<'a, CStr> {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        self.to_str().map_err(|_utf8_err| io::Errno::INVAL)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        let borrow: &CStr = core::borrow::Borrow::borrow(self);
+//        borrow.to_string_lossy()
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Borrowed(self))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(self)
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        f(&self)
+//    }
+//}
 
 #[cfg(feature = "std")]
 impl<'a> Arg for Component<'a> {
@@ -787,65 +787,27 @@ impl Arg for &[u8] {
         str::from_utf8(self).map_err(|_utf8_err| io::Errno::INVAL)
     }
 
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        String::from_utf8_lossy(self)
-    }
+    //#[inline]
+    //fn to_string_lossy(&self) -> Cow<'_, str> {
+    //    String::from_utf8_lossy(self)
+    //}
 
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(*self).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
+    //#[inline]
+    //fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+    //    Ok(Cow::Owned(
+    //        CString::new(*self).map_err(|_cstr_err| io::Errno::INVAL)?,
+    //    ))
+    //}
 
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(
-            CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        with_c_str(self, f)
-    }
-}
-
-impl Arg for &Vec<u8> {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        str::from_utf8(self).map_err(|_utf8_err| io::Errno::INVAL)
-    }
-
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        String::from_utf8_lossy(self)
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(self.as_slice()).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(
-            CString::new(self.as_slice()).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
+    //#[inline]
+    //fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+    //where
+    //    Self: 'b,
+    //{
+    //    Ok(Cow::Owned(
+    //        CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
+    //    ))
+    //}
 
     #[inline]
     fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
@@ -857,43 +819,81 @@ impl Arg for &Vec<u8> {
     }
 }
 
-impl Arg for Vec<u8> {
-    #[inline]
-    fn as_str(&self) -> io::Result<&str> {
-        str::from_utf8(self).map_err(|_utf8_err| io::Errno::INVAL)
-    }
-
-    #[inline]
-    fn to_string_lossy(&self) -> Cow<'_, str> {
-        String::from_utf8_lossy(self)
-    }
-
-    #[inline]
-    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
-        Ok(Cow::Owned(
-            CString::new(self.as_slice()).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
-    where
-        Self: 'b,
-    {
-        Ok(Cow::Owned(
-            CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
-        ))
-    }
-
-    #[inline]
-    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
-    where
-        Self: Sized,
-        F: FnOnce(&CStr) -> io::Result<T>,
-    {
-        f(&CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?)
-    }
-}
+//impl Arg for &Vec<u8> {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        str::from_utf8(self).map_err(|_utf8_err| io::Errno::INVAL)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        String::from_utf8_lossy(self)
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Owned(
+//            CString::new(self.as_slice()).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(Cow::Owned(
+//            CString::new(self.as_slice()).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        with_c_str(self, f)
+//    }
+//}
+//
+//impl Arg for Vec<u8> {
+//    #[inline]
+//    fn as_str(&self) -> io::Result<&str> {
+//        str::from_utf8(self).map_err(|_utf8_err| io::Errno::INVAL)
+//    }
+//
+//    #[inline]
+//    fn to_string_lossy(&self) -> Cow<'_, str> {
+//        String::from_utf8_lossy(self)
+//    }
+//
+//    #[inline]
+//    fn as_cow_c_str(&self) -> io::Result<Cow<'_, CStr>> {
+//        Ok(Cow::Owned(
+//            CString::new(self.as_slice()).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_c_str<'b>(self) -> io::Result<Cow<'b, CStr>>
+//    where
+//        Self: 'b,
+//    {
+//        Ok(Cow::Owned(
+//            CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?,
+//        ))
+//    }
+//
+//    #[inline]
+//    fn into_with_c_str<T, F>(self, f: F) -> io::Result<T>
+//    where
+//        Self: Sized,
+//        F: FnOnce(&CStr) -> io::Result<T>,
+//    {
+//        f(&CString::new(self).map_err(|_cstr_err| io::Errno::INVAL)?)
+//    }
+//}
 
 #[cfg(feature = "itoa")]
 impl Arg for DecInt {
@@ -955,9 +955,10 @@ where
 /// The slow path which handles any length. In theory OS's only support up
 /// to `PATH_MAX`, but we let the OS enforce that.
 #[cold]
-fn with_c_str_slow_path<T, F>(bytes: &[u8], f: F) -> io::Result<T>
+fn with_c_str_slow_path<T, F>(_bytes: &[u8], _f: F) -> io::Result<T>
 where
     F: FnOnce(&CStr) -> io::Result<T>,
 {
-    f(&CString::new(bytes).map_err(|_cstr_err| io::Errno::INVAL)?)
+    return io::Result::Err(io::Errno::NOMEM)
+    //f(&CString::new(bytes).map_err(|_cstr_err| io::Errno::INVAL)?)
 }

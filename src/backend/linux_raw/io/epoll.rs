@@ -60,17 +60,17 @@
 #![allow(unsafe_code)]
 
 use super::super::c;
-use crate::backend::io::syscalls::{epoll_add, epoll_create, epoll_del, epoll_mod, epoll_wait};
+use crate::backend::io::syscalls::{epoll_add, epoll_create, epoll_del, epoll_mod, /*epoll_wait*/};
 use crate::fd::{AsFd, AsRawFd, BorrowedFd, OwnedFd, RawFd};
 #[cfg(feature = "std")]
 use crate::fd::{FromRawFd, IntoRawFd};
 use crate::io;
-use alloc::vec::Vec;
+//use alloc::vec::Vec;
 use bitflags::bitflags;
 use core::fmt;
 use core::marker::PhantomData;
 use core::ops::Deref;
-use core::ptr::null;
+//use core::ptr::null;
 
 bitflags! {
     /// `EPOLL_*` for use with [`Epoll::new`].
@@ -358,33 +358,33 @@ impl<Context: self::Context> Epoll<Context> {
         Ok(self.context.release(target))
     }
 
-    /// `epoll_wait(self, events, timeout)`—Waits for registered events of
-    /// interest.
-    ///
-    /// For each event of interest, an element is written to `events`. On
-    /// success, this returns the number of written elements.
-    #[doc(alias = "epoll_wait")]
-    pub fn wait<'context>(
-        &'context self,
-        event_list: &mut EventVec<'context, Context>,
-        timeout: c::c_int,
-    ) -> io::Result<()> {
-        // Safety: We're calling `epoll_wait` via FFI and we know how it
-        // behaves.
-        unsafe {
-            event_list.events.set_len(0);
-            let nfds = epoll_wait(
-                self.epoll_fd.as_fd(),
-                event_list.events[..].as_mut_ptr().cast(),
-                event_list.events.capacity(),
-                timeout,
-            )?;
-            event_list.events.set_len(nfds);
-            event_list.context = &self.context;
-        }
+    ///// `epoll_wait(self, events, timeout)`—Waits for registered events of
+    ///// interest.
+    /////
+    ///// For each event of interest, an element is written to `events`. On
+    ///// success, this returns the number of written elements.
+    //#[doc(alias = "epoll_wait")]
+    //pub fn wait<'context>(
+    //    &'context self,
+    //    event_list: &mut EventVec<'context, Context>,
+    //    timeout: c::c_int,
+    //) -> io::Result<()> {
+    //    // Safety: We're calling `epoll_wait` via FFI and we know how it
+    //    // behaves.
+    //    unsafe {
+    //        event_list.events.set_len(0);
+    //        let nfds = epoll_wait(
+    //            self.epoll_fd.as_fd(),
+    //            event_list.events[..].as_mut_ptr().cast(),
+    //            event_list.events.capacity(),
+    //            timeout,
+    //        )?;
+    //        event_list.events.set_len(nfds);
+    //        event_list.context = &self.context;
+    //    }
 
-        Ok(())
-    }
+    //    Ok(())
+    //}
 }
 
 #[cfg(feature = "std")]
@@ -473,83 +473,83 @@ struct Event {
     encoded: u64,
 }
 
-/// A vector of `Event`s, plus context for interpreting them.
-pub struct EventVec<'context, Context: self::Context> {
-    events: Vec<Event>,
-    context: *const Context,
-    _phantom: PhantomData<&'context Context>,
-}
-
-impl<'context, Context: self::Context> EventVec<'context, Context> {
-    /// Constructs an `EventVec` with memory for `capacity` `Event`s.
-    #[inline]
-    pub fn with_capacity(capacity: usize) -> Self {
-        Self {
-            events: Vec::with_capacity(capacity),
-            context: null(),
-            _phantom: PhantomData,
-        }
-    }
-
-    /// Returns the current `Event` capacity of this `EventVec`.
-    #[inline]
-    pub fn capacity(&self) -> usize {
-        self.events.capacity()
-    }
-
-    /// Reserves enough memory for at least `additional` more `Event`s.
-    #[inline]
-    pub fn reserve(&mut self, additional: usize) {
-        self.events.reserve(additional);
-    }
-
-    /// Reserves enough memory for exactly `additional` more `Event`s.
-    #[inline]
-    pub fn reserve_exact(&mut self, additional: usize) {
-        self.events.reserve_exact(additional);
-    }
-
-    /// Clears all the `Events` out of this `EventVec`.
-    #[inline]
-    pub fn clear(&mut self) {
-        self.events.clear();
-    }
-
-    /// Shrinks the capacity of this `EventVec` as much as possible.
-    #[inline]
-    pub fn shrink_to_fit(&mut self) {
-        self.events.shrink_to_fit();
-    }
-
-    /// Returns an iterator over the `Event`s in this `EventVec`.
-    #[inline]
-    pub fn iter(&self) -> Iter<'_, Context> {
-        Iter {
-            iter: self.events.iter(),
-            context: self.context,
-            _phantom: PhantomData,
-        }
-    }
-
-    /// Returns the number of `Event`s logically contained in this `EventVec`.
-    #[inline]
-    pub fn len(&mut self) -> usize {
-        self.events.len()
-    }
-
-    /// Tests whether this `EventVec` is logically empty.
-    #[inline]
-    pub fn is_empty(&mut self) -> bool {
-        self.events.is_empty()
-    }
-}
-
-impl<'context, Context: self::Context> IntoIterator for &'context EventVec<'context, Context> {
-    type IntoIter = Iter<'context, Context>;
-    type Item = (EventFlags, Ref<'context, Context::Target>);
-
-    #[inline]
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
+///// A vector of `Event`s, plus context for interpreting them.
+//pub struct EventVec<'context, Context: self::Context> {
+//    events: Vec<Event>,
+//    context: *const Context,
+//    _phantom: PhantomData<&'context Context>,
+//}
+//
+//impl<'context, Context: self::Context> EventVec<'context, Context> {
+//    /// Constructs an `EventVec` with memory for `capacity` `Event`s.
+//    #[inline]
+//    pub fn with_capacity(capacity: usize) -> Self {
+//        Self {
+//            events: Vec::with_capacity(capacity),
+//            context: null(),
+//            _phantom: PhantomData,
+//        }
+//    }
+//
+//    /// Returns the current `Event` capacity of this `EventVec`.
+//    #[inline]
+//    pub fn capacity(&self) -> usize {
+//        self.events.capacity()
+//    }
+//
+//    /// Reserves enough memory for at least `additional` more `Event`s.
+//    #[inline]
+//    pub fn reserve(&mut self, additional: usize) {
+//        self.events.reserve(additional);
+//    }
+//
+//    /// Reserves enough memory for exactly `additional` more `Event`s.
+//    #[inline]
+//    pub fn reserve_exact(&mut self, additional: usize) {
+//        self.events.reserve_exact(additional);
+//    }
+//
+//    /// Clears all the `Events` out of this `EventVec`.
+//    #[inline]
+//    pub fn clear(&mut self) {
+//        self.events.clear();
+//    }
+//
+//    /// Shrinks the capacity of this `EventVec` as much as possible.
+//    #[inline]
+//    pub fn shrink_to_fit(&mut self) {
+//        self.events.shrink_to_fit();
+//    }
+//
+//    /// Returns an iterator over the `Event`s in this `EventVec`.
+//    #[inline]
+//    pub fn iter(&self) -> Iter<'_, Context> {
+//        Iter {
+//            iter: self.events.iter(),
+//            context: self.context,
+//            _phantom: PhantomData,
+//        }
+//    }
+//
+//    /// Returns the number of `Event`s logically contained in this `EventVec`.
+//    #[inline]
+//    pub fn len(&mut self) -> usize {
+//        self.events.len()
+//    }
+//
+//    /// Tests whether this `EventVec` is logically empty.
+//    #[inline]
+//    pub fn is_empty(&mut self) -> bool {
+//        self.events.is_empty()
+//    }
+//}
+//
+//impl<'context, Context: self::Context> IntoIterator for &'context EventVec<'context, Context> {
+//    type IntoIter = Iter<'context, Context>;
+//    type Item = (EventFlags, Ref<'context, Context::Target>);
+//
+//    #[inline]
+//    fn into_iter(self) -> Self::IntoIter {
+//        self.iter()
+//    }
+//}

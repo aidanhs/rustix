@@ -11,6 +11,6 @@ pub use {
 // in new versions of Rust.
 #[cfg(not(feature = "std"))]
 pub use {
-    alloc::ffi::{CString, NulError},
+    //alloc::ffi::{CString, NulError},
     core::ffi::{c_char, CStr, FromBytesWithNulError},
 };

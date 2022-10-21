@@ -106,8 +106,8 @@
 #![cfg_attr(io_lifetimes_use_std, feature(io_safety))]
 #![cfg_attr(core_ffi_c, feature(core_ffi_c))]
 #![cfg_attr(core_c_str, feature(core_c_str))]
-#![cfg_attr(alloc_c_string, feature(alloc_ffi))]
-#![cfg_attr(alloc_c_string, feature(alloc_c_string))]
+//#![cfg_attr(alloc_c_string, feature(alloc_ffi))]
+//#![cfg_attr(alloc_c_string, feature(alloc_c_string))]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(feature = "rustc-dep-of-std", feature(core_intrinsics))]
 #![cfg_attr(feature = "rustc-dep-of-std", feature(ip))]
@@ -118,8 +118,8 @@
 #![cfg_attr(asm_experimental_arch, feature(asm_experimental_arch))]
 #![cfg_attr(not(feature = "all-apis"), allow(dead_code))]
 
-#[cfg(not(feature = "rustc-dep-of-std"))]
-extern crate alloc;
+//#[cfg(not(feature = "rustc-dep-of-std"))]
+//extern crate alloc;
 
 // Internal utilities.
 #[cfg(not(windows))]
