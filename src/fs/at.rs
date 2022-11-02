@@ -6,7 +6,7 @@
 //! [`cwd`]: crate::fs::cwd
 
 use crate::fd::OwnedFd;
-use crate::ffi::{CStr, CString};
+//use crate::ffi::{CStr, CString};
 #[cfg(not(any(target_os = "illumos", target_os = "solaris")))]
 use crate::fs::Access;
 #[cfg(any(target_os = "ios", target_os = "macos"))]
@@ -17,12 +17,12 @@ use crate::fs::FileType;
 use crate::fs::RenameFlags;
 use crate::fs::{AtFlags, Mode, OFlags, Stat, Timestamps};
 use crate::io;
-use crate::path::SMALL_PATH_BUFFER_SIZE;
+//use crate::path::SMALL_PATH_BUFFER_SIZE;
 #[cfg(not(target_os = "wasi"))]
 use crate::process::{Gid, Uid};
 use crate::{backend, path};
-use alloc::vec::Vec;
-use backend::fd::{AsFd, BorrowedFd};
+//use alloc::vec::Vec;
+use backend::fd::{AsFd/*, BorrowedFd*/};
 use backend::time::types::Nsecs;
 
 pub use backend::fs::types::{Dev, RawMode};
@@ -65,45 +65,45 @@ pub fn openat<P: path::Arg, Fd: AsFd>(
     })
 }
 
-/// `readlinkat(fd, path)`—Reads the contents of a symlink.
-///
-/// If `reuse` is non-empty, reuse its buffer to store the result if possible.
-///
-/// # References
-///  - [POSIX]
-///  - [Linux]
-///
-/// [POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/readlinkat.html
-/// [Linux]: https://man7.org/linux/man-pages/man2/readlinkat.2.html
-#[inline]
-pub fn readlinkat<P: path::Arg, Fd: AsFd, B: Into<Vec<u8>>>(
-    dirfd: Fd,
-    path: P,
-    reuse: B,
-) -> io::Result<CString> {
-    path.into_with_c_str(|path| _readlinkat(dirfd.as_fd(), path, reuse.into()))
-}
+///// `readlinkat(fd, path)`—Reads the contents of a symlink.
+/////
+///// If `reuse` is non-empty, reuse its buffer to store the result if possible.
+/////
+///// # References
+/////  - [POSIX]
+/////  - [Linux]
+/////
+///// [POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799/functions/readlinkat.html
+///// [Linux]: https://man7.org/linux/man-pages/man2/readlinkat.2.html
+//#[inline]
+//pub fn readlinkat<P: path::Arg, Fd: AsFd, B: Into<Vec<u8>>>(
+//    dirfd: Fd,
+//    path: P,
+//    reuse: B,
+//) -> io::Result<CString> {
+//    path.into_with_c_str(|path| _readlinkat(dirfd.as_fd(), path, reuse.into()))
+//}
 
-fn _readlinkat(dirfd: BorrowedFd<'_>, path: &CStr, mut buffer: Vec<u8>) -> io::Result<CString> {
-    // This code would benefit from having a better way to read into
-    // uninitialized memory, but that requires `unsafe`.
-    buffer.clear();
-    buffer.reserve(SMALL_PATH_BUFFER_SIZE);
-    buffer.resize(buffer.capacity(), 0_u8);
-
-    loop {
-        let nread = backend::fs::syscalls::readlinkat(dirfd.as_fd(), path, &mut buffer)?;
-
-        let nread = nread as usize;
-        assert!(nread <= buffer.len());
-        if nread < buffer.len() {
-            buffer.resize(nread, 0_u8);
-            return Ok(CString::new(buffer).unwrap());
-        }
-        buffer.reserve(1); // use `Vec` reallocation strategy to grow capacity exponentially
-        buffer.resize(buffer.capacity(), 0_u8);
-    }
-}
+//fn _readlinkat(dirfd: BorrowedFd<'_>, path: &CStr, mut buffer: Vec<u8>) -> io::Result<CString> {
+//    // This code would benefit from having a better way to read into
+//    // uninitialized memory, but that requires `unsafe`.
+//    buffer.clear();
+//    buffer.reserve(SMALL_PATH_BUFFER_SIZE);
+//    buffer.resize(buffer.capacity(), 0_u8);
+//
+//    loop {
+//        let nread = backend::fs::syscalls::readlinkat(dirfd.as_fd(), path, &mut buffer)?;
+//
+//        let nread = nread as usize;
+//        assert!(nread <= buffer.len());
+//        if nread < buffer.len() {
+//            buffer.resize(nread, 0_u8);
+//            return Ok(CString::new(buffer).unwrap());
+//        }
+//        buffer.reserve(1); // use `Vec` reallocation strategy to grow capacity exponentially
+//        buffer.resize(buffer.capacity(), 0_u8);
+//    }
+//}
 
 /// `mkdirat(fd, path, mode)`—Creates a directory.
 ///

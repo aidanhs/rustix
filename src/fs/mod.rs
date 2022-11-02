@@ -18,8 +18,8 @@ mod copy_file_range;
 #[cfg(not(target_os = "redox"))]
 mod cwd;
 #[cfg(not(target_os = "redox"))]
-#[cfg(any(feature = "fs", feature = "procfs"))]
-mod dir;
+//#[cfg(any(feature = "fs", feature = "procfs"))]
+//mod dir;
 #[cfg(not(any(
     target_os = "dragonfly",
     target_os = "haiku",
@@ -114,7 +114,7 @@ pub use at::{chmodat, chownat};
     target_arch = "x86"
 ))]
 pub use at::{
-    linkat, mkdirat, openat, readlinkat, renameat, statat, symlinkat, unlinkat, utimensat, RawMode,
+    linkat, mkdirat, openat, /*readlinkat, */renameat, statat, symlinkat, unlinkat, utimensat, RawMode,
     UTIME_NOW, UTIME_OMIT,
 };
 #[cfg(any(target_os = "ios", target_os = "macos"))]
@@ -134,8 +134,8 @@ pub use copy_file_range::copy_file_range;
 #[cfg(not(target_os = "redox"))]
 pub use cwd::cwd;
 #[cfg(not(target_os = "redox"))]
-#[cfg(any(feature = "fs", feature = "procfs"))]
-pub use dir::{Dir, DirEntry};
+//#[cfg(any(feature = "fs", feature = "procfs"))]
+//pub use dir::{Dir, DirEntry};
 #[cfg(not(any(
     target_os = "dragonfly",
     target_os = "haiku",
